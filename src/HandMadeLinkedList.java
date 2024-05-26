@@ -48,8 +48,8 @@ public class HandMadeLinkedList<T> {
     }
 
     public T getLast() {
-        final Node<T> curTail = tail;
-        if (curTail == null)
+        final Node<T> currentTail = tail;
+        if (currentTail == null)
             throw new NoSuchElementException();
         return tail.data;
     }
@@ -69,8 +69,9 @@ public class HandMadeLinkedList<T> {
         Node<T> left = getNode(index - 1);
         Node<T> right = left.next;
         final Node<T> newNode = new Node<>(left, element, right);
-        left.next = newNode;
+        newNode.prev = left;
         newNode.next = right;
+        right.prev = newNode;
         size++;
         if (right == null) {
             tail = newNode;
@@ -82,18 +83,14 @@ public class HandMadeLinkedList<T> {
         if (tail == null) {
             return;
         }
-        if (head == tail) {
-            head = null;
-            tail = null;
-            return;
+
+        Node<T> currentTail = tail.prev;
+        if (currentTail != null) {
+            currentTail.next = null;
+            tail = currentTail;
+            size--;
         }
-        Node<T> current = head;
-        while (current.next != tail) {
-            current = current.next;
-        }
-        current.next = null;
-        tail = current;
-        size--;
+
     }
 
     public void removeFirst() {
@@ -105,9 +102,9 @@ public class HandMadeLinkedList<T> {
             head = null;
             return;
         }
-        Node<T> currentHead = head;
-        head = currentHead.next;
-        currentHead = null;
+        Node<T> currentHead = head.next;
+        currentHead.prev = null;
+        head = currentHead;
     }
 
     public void removeElement(int index) {
@@ -118,12 +115,13 @@ public class HandMadeLinkedList<T> {
         } else if (index == size) {
             removeLast();
         } else {
-            Node<T> left = getNode(index - 1);
-            Node<T> node = left.next;
-            if (node == null) return;
-            Node<T> right = node.next;
+            Node<T> currentNode = getNode(index);
+            Node<T> left = currentNode.prev;
+            Node<T> right = currentNode.next;
             left.next = right;
-            if (node == tail) {
+            right.prev = left;
+//            currentNode = null;?????
+            if (currentNode == tail) {
                 tail = null;
             }
         }
